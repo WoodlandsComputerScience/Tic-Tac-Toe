@@ -30,6 +30,24 @@ def setup(lineColor, lineWidth):
 
 setup(BLACK, 5);
 
+def displayBoard():
+    for y in range(3):
+        for x in range(3):
+            cur = board[x][y]
+            print("_" if cur==0 else ("X" if cur==1 else "O"), end=",")
+        print()
+
+def checkWin(board):
+    if board[1][1]!=0 and ((board[0][0]==board[1][1] and board[1][1]==board[2][2]) or (board[2][0]==board[1][1] and board[1][1]==board[0][2])):
+        return True
+    for x in range(3):
+        if board[x][1]!=0 and (board[x][0]==board[x][1] and board[x][1]==board[x][2]):
+            return True
+    for y in range(3):
+        if board[1][y]!=0 and (board[0][y]==board[1][y] and board[1][y]==board[2][y]):
+            return True
+    return False
+
 while(True):
     for ev in pygame.event.get():
         if(ev.type == pygame.QUIT):
@@ -47,12 +65,18 @@ while(True):
                 print(str(row) + " " + str(col))
                 #draw either an x or an o on the screen depending on whose turn it is
                 #red and blue right now because i'm lazy
-                if(turn % 2):
+                if(turn % 2): # X
                     pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
                     board[col][row] = 1
-                else:
+                else:         # O
                     pygame.draw.circle(screen, BLUE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
                     board[col][row] = 2
                 turn += 1
-        
+            displayBoard()
+
+            if checkWin(board):
+                print(("O" if turn % 2 else "X") +" won!")
+                break
+
         pygame.display.update()
+
