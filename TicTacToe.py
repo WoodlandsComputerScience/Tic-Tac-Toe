@@ -81,10 +81,12 @@ while(True):
                 #draw either an x or an o on the screen depending on whose turn it is
                 #red and blue right now because i'm lazy
                 if(turn % 2): # X
-                    pygame.draw.circle(screen, BLUE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 40)
+                    pygame.draw.line(screen, BLUE, (screenWidth/3*col+50,screenWidth/3*row+50), (screenWidth/3*col+150,screenWidth/3*row+150), 30)
+                    pygame.draw.line(screen, BLUE, (screenWidth/3*col+150,screenWidth/3*row+50), (screenWidth/3*col+50,screenWidth/3*row+150), 30)
                     board[col][row] = 1
                 else:         # O
-                    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
+                    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 70)
+                    pygame.draw.circle(screen, WHITE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 45)
                     board[col][row] = 2
                 turn += 1
             displayBoard()
