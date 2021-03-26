@@ -30,6 +30,13 @@ def setup(lineColor, lineWidth):
 
 setup(BLACK, 5);
 
+def resetBoard():
+    global board,turn
+    board = [[0]*3 for i in range(3)]
+    turn = 0
+    screen.fill(WHITE)
+    setup(BLACK, 5);
+
 def displayBoard():
     for y in range(3):
         for x in range(3):
@@ -38,15 +45,23 @@ def displayBoard():
         print()
 
 def checkWin(board):
+    finished=True
+    for y in range(3):
+        if finished:
+            for x in range(3):
+                if board[x][y]==0:
+                    finished=False
+    if finished:
+        return -1
     if board[1][1]!=0 and ((board[0][0]==board[1][1] and board[1][1]==board[2][2]) or (board[2][0]==board[1][1] and board[1][1]==board[0][2])):
-        return True
+        return 1
     for x in range(3):
         if board[x][1]!=0 and (board[x][0]==board[x][1] and board[x][1]==board[x][2]):
-            return True
+            return 1
     for y in range(3):
         if board[1][y]!=0 and (board[0][y]==board[1][y] and board[1][y]==board[2][y]):
-            return True
-    return False
+            return 1
+    return 0
 
 while(True):
     for ev in pygame.event.get():
@@ -66,17 +81,23 @@ while(True):
                 #draw either an x or an o on the screen depending on whose turn it is
                 #red and blue right now because i'm lazy
                 if(turn % 2): # X
-                    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
+                    pygame.draw.circle(screen, BLUE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 40)
                     board[col][row] = 1
                 else:         # O
-                    pygame.draw.circle(screen, BLUE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
+                    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 20)
                     board[col][row] = 2
                 turn += 1
             displayBoard()
 
-            if checkWin(board):
+            status = checkWin(board)
+            if status==1:
                 print(("O" if turn % 2 else "X") +" won!")
-                break
+            elif status==-1:
+                print("DRAW!")
+            if status==1 or status==-1:
+                # TODO: wait for reset button to be pressed
+                print("Reseting board...")
+                resetBoard()
 
         pygame.display.update()
 
