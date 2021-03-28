@@ -21,12 +21,23 @@ board = [[0]*3 for i in range(3)]
 #keep track of how many turns have elapsed
 turn = 0
 
+score_o=0
+score_x=0
+
+def renderScore():
+    font = pygame.font.SysFont("Source Code Pro", 28)
+    label_o = font.render(f"{score_o}", 1, RED)
+    screen.blit(label_o, (10, 10))
+    label_x = font.render(f"{score_x}", 1, BLUE)
+    screen.blit(label_x, (10, 30))
+
 #draws a 3x3 grid onto the screen
 def setup(lineColor, lineWidth):
     pygame.draw.line(screen, lineColor, (screenWidth/3, 0), (screenWidth/3, screenHeight), lineWidth)
     pygame.draw.line(screen, lineColor, (screenWidth/3*2, 0), (screenWidth/3*2, screenHeight), lineWidth)
     pygame.draw.line(screen, lineColor, (0, screenHeight/3), (screenWidth, screenHeight/3), lineWidth)
     pygame.draw.line(screen, lineColor, (0, screenHeight/3*2), (screenWidth, screenHeight/3*2), lineWidth)
+    renderScore()
 
 setup(BLACK, 5);
 
@@ -94,11 +105,16 @@ while(True):
 
             status = checkWin(board)
             if status==1:
+                if turn%2:
+                    score_o+=1
+                else:
+                    score_x+=1
                 print(("O" if turn % 2 else "X") +" won!")
             elif status==-1:
                 print("DRAW!")
             if status==1 or status==-1:
                 # TODO: wait for reset button to be pressed
+                print(f"Scores\n * O: {score_o}\n * X: {score_x}")
                 print("Reseting board in three seconds...")
                 pygame.time.wait(3000)
                 resetBoard()
