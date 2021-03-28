@@ -90,6 +90,7 @@ while(True):
                     board[col][row] = 2
                 turn += 1
             displayBoard()
+            pygame.display.update()
 
             status = checkWin(board)
             if status==1:
@@ -98,7 +99,8 @@ while(True):
                 print("DRAW!")
             if status==1 or status==-1:
                 # TODO: wait for reset button to be pressed
-                print("Reseting board...")
+                print("Reseting board in three seconds...")
+                pygame.time.wait(3000)
                 resetBoard()
 
         pygame.display.update()
