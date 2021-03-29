@@ -10,7 +10,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-
+GREY = (180, 180, 180)
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Tic Tac Toe")
 screen.fill(WHITE)
@@ -21,6 +21,8 @@ board = [[0]*3 for i in range(3)]
 # keep track of how many turns have elapsed
 turn = 0
 
+gameEnd = False
+
 score_o = 0
 score_x = 0
 
@@ -30,7 +32,7 @@ def renderScore():
     screen.blit(label_o, (10, 10))
     label_x = font.render(f"{score_x}", 1, BLUE)
     screen.blit(label_x, (10, 30))
-
+    
 # draws a 3x3 grid onto the screen
 def setup(lineColor, lineWidth):
     pygame.draw.line(screen, lineColor, (screenWidth/3, 0), (screenWidth/3, screenHeight), lineWidth)
@@ -39,10 +41,8 @@ def setup(lineColor, lineWidth):
     pygame.draw.line(screen, lineColor, (0, screenHeight/3*2), (screenWidth, screenHeight/3*2), lineWidth)
     renderScore()
 
-setup(BLACK, 5);
-
 def resetBoard():
-    global board,turn
+    global board, turn
     board = [[0]*3 for i in range(3)]
     turn = 0
     screen.fill(WHITE)
@@ -54,6 +54,33 @@ def displayBoard():
             cur = board[x][y]
             print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = ",")
         print()
+
+# draws X
+def drawX(row, col):
+    linePos1 = ((screenWidth/3*col+50,screenWidth/3*row+50), (screenWidth/3*col+150,screenWidth/3*row+150))
+    linePos2 = ((screenWidth/3*col+150,screenWidth/3*row+50), (screenWidth/3*col+50,screenWidth/3*row+150))
+    pygame.draw.line(screen, BLUE, linePos1[0], linePos1[1], 30)
+    pygame.draw.line(screen, BLUE, linePos2[0], linePos2[1], 30)
+
+# draws O
+def drawO(row, col):
+    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 70)
+    pygame.draw.circle(screen, WHITE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 45)
+
+# draws rectangle at the center of the screen using given colour
+def drawEndRectangle(colour):
+    s = pygame.Surface((500, 150))  # the size of your rect
+    s.set_alpha(200)                # alpha level
+    s.fill((colour))                # this fills the entire surface
+    screen.blit(s, (50, 225))       # (0,0) are the top-left coordinates
+    pygame.draw.rect(screen, BLACK, pygame.Rect(50, 225, 500, 150), 6)
+
+# displays message at the center of the screen
+def displayMessage(message, y):
+    font = pygame.font.SysFont("Source Code Pro", 40)
+    displayText = font.render(message, 1, BLACK)
+    displayPosition = displayText.get_rect(center = (screenWidth/2, screenHeight/2 + y))
+    screen.blit(displayText, displayPosition)
 
 def checkWin(board):
     # check for diagonal wins
@@ -70,15 +97,22 @@ def checkWin(board):
             return True
     return False
 
+setup(BLACK, 5);
+pygame.display.update()
+
 while(True):
     for ev in pygame.event.get():
         if(ev.type == pygame.QUIT):
             sys.exit()
-
-        #if the user clicks on the screen
-        if(ev.type == pygame.MOUSEBUTTONDOWN):
+        # check if the game has ended and is waiting to restart
+        if(gameEnd and ev.type == pygame.MOUSEBUTTONDOWN):
+            gameEnd = False
+            resetBoard()
+        # game still active, user clicks on screen
+        elif(ev.type == pygame.MOUSEBUTTONDOWN):
             x = ev.pos[0]
             y = ev.pos[1]
+            
             # calculate where in the 3x3 grid the user clicked
             row = y // (screenHeight // 3)
             col = x // (screenWidth // 3)
@@ -88,35 +122,42 @@ while(True):
                 print(str(row) + " " + str(col))
                 # draw either an x or an o on the screen depending on whose turn it is
                 if(turn % 2): # X
-                    pygame.draw.line(screen, BLUE, (screenWidth/3*col+50,screenWidth/3*row+50), (screenWidth/3*col+150,screenWidth/3*row+150), 30)
-                    pygame.draw.line(screen, BLUE, (screenWidth/3*col+150,screenWidth/3*row+50), (screenWidth/3*col+50,screenWidth/3*row+150), 30)
+                    drawX(row, col)
                     board[col][row] = 1
                 else:         # O
-                    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 70)
-                    pygame.draw.circle(screen, WHITE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 45)
+                    drawO(row, col)
                     board[col][row] = 2
 
                 # increment turn, redraw board
                 turn += 1
                 displayBoard()
-                pygame.display.update()
 
                 # check to see if the game has been won using checkWin function
-                game_won = checkWin(board)
-                if(game_won):
+                gameWon = checkWin(board)
+                if(gameWon):
                     if(turn % 2):
                         score_o += 1
+                        drawEndRectangle((240,180,180))
                     else:
                         score_x += 1
+                        drawEndRectangle((180,180,240))
+                    displayMessage("Game over. " + ("O" if turn % 2 else "X") + " won!", -20)
                     print(("O" if turn % 2 else "X") + " won!")
+                
+                # board is full, game is drawn
                 elif(turn == 9):
+                    drawEndRectangle((180,180,180))
+                    font = pygame.font.SysFont("Source Code Pro", 40)
+                    displayMessage("Game over. It's a draw!", -20)
                     print("DRAW!")
-                if(game_won == 1 or turn == 9):
-                    # TODO: wait for reset button to be pressed
+                
+                # game ends
+                if(gameWon or turn == 9):
+                    # print end screen text
+                    displayMessage("Click again to reset.", 20)
+                    
+                    # wait for player to click to reset
                     print(f"Scores\n * O: {score_o}\n * X: {score_x}")
-                    print("Reseting board in three seconds...")
-                    pygame.time.wait(3000)
-                    resetBoard()
-
+                    print("Waiting for reset...")
+                    gameEnd = True
         pygame.display.update()
-
