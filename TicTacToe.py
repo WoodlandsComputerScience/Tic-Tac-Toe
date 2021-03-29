@@ -137,16 +137,18 @@ while(True):
                 if(gameWon):
                     if(turn % 2):
                         score_o += 1
+                        # draw rectangle for end screen, tint colour of the winning player
                         drawEndRectangle((240,180,180))
                     else:
                         score_x += 1
                         drawEndRectangle((180,180,240))
+                    # display game over message
                     displayMessage("Game over. " + ("O" if turn % 2 else "X") + " won!", -20)
                     print(("O" if turn % 2 else "X") + " won!")
                 
                 # board is full, game is drawn
                 elif(turn == 9):
-                    drawEndRectangle((180,180,180))
+                    drawEndRectangle(GREY)
                     font = pygame.font.SysFont("Source Code Pro", 40)
                     displayMessage("Game over. It's a draw!", -20)
                     print("DRAW!")
