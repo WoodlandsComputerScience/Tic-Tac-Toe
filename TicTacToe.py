@@ -49,10 +49,14 @@ def resetBoard():
     setup(BLACK, 5);
 
 def displayBoard():
+    #for z in range(3*2+1):
+    #    print("_", end="")
+    #print()
     for y in range(3):
+        print("|", end="")
         for x in range(3):
             cur = board[x][y]
-            print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = ",")
+            print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = "|")
         print()
 
 # draws X
