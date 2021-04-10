@@ -52,9 +52,9 @@ def displayBoard():
     #for z in range(3*2+1):
     #    print("_", end="")
     #print()
-    for y in range(3):
+    for x in range(3):
         print("|", end="")
-        for x in range(3):
+        for y in range(3):
             cur = board[x][y]
             print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = "|")
         print()
@@ -122,15 +122,15 @@ while(True):
             col = x // (screenWidth // 3)
             
             # check that the spot in the board is empty
-            if(board[col][row] == 0):
+            if(board[row][col] == 0):
                 print(str(row) + " " + str(col))
                 # draw either an x or an o on the screen depending on whose turn it is
                 if(turn % 2): # X
                     drawX(row, col)
-                    board[col][row] = 1
+                    board[row][col] = 1
                 else:         # O
                     drawO(row, col)
-                    board[col][row] = 2
+                    board[row][col] = 2
 
                 # increment turn, redraw board
                 turn += 1
