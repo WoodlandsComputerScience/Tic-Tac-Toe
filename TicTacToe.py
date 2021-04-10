@@ -1,4 +1,5 @@
 import pygame, sys, random
+from BotMoves import botMove
 
 pygame.init()
 
@@ -49,9 +50,6 @@ def resetBoard():
     setup(BLACK, 5);
 
 def displayBoard():
-    #for z in range(3*2+1):
-    #    print("_", end="")
-    #print()
     for x in range(3):
         print("|", end="")
         for y in range(3):
@@ -86,20 +84,22 @@ def displayMessage(message, y):
     displayPosition = displayText.get_rect(center = (screenWidth/2, screenHeight/2 + y))
     screen.blit(displayText, displayPosition)
 
-def checkWin(board):
-    # check for diagonal wins
-    if(board[1][1] != 0 and ((board[0][0] == board[1][1] and board[1][1] == board[2][2])
-                        or (board[2][0] == board[1][1] and board[1][1] == board[0][2]))):
-        return True
-    # check for horizontal wins
-    for x in range(3):
-        if(board[x][1] != 0 and (board[x][0] == board[x][1] and board[x][1] == board[x][2])):
-            return True
-    # check for vertical wins
-    for y in range(3):
-        if(board[1][y] != 0 and (board[0][y] == board[1][y] and board[1][y] == board[2][y])):
-            return True
-    return False
+def checkWin(board): 
+    # a tuple - (if win exists, returns 1 if player1 wins 0 if player2/CPU wins)
+    # check rows and cols
+    for i in range(3):
+        if(board[i][0] != 0 and board[i][0]==board[i][1] and board[i][1]==board[i][2]):
+            return (1, board[i][0] == 1)
+        if(board[0][i] != 0 and board[0][i]==board[1][i] and board[1][i]==board[2][i]):
+            return (1, board[0][i] == 1)
+
+    # check diagonals
+    if(board[0][0] != 0 and board[0][0]==board[1][1] and board[1][1]==board[2][2]):
+        return (1, board[1][1] == 1)
+    if(board[0][2] != 0 and board[0][2]==board[1][1] and board[1][1]==board[2][0]):
+        return (1, board[1][1] == 1)
+
+    return (0, 0) 
 
 setup(BLACK, 5);
 pygame.display.update()
@@ -124,22 +124,26 @@ while(True):
             # check that the spot in the board is empty
             if(board[row][col] == 0):
                 print(str(row) + " " + str(col))
-                # draw either an x or an o on the screen depending on whose turn it is
-                if(turn % 2): # X
-                    drawX(row, col)
-                    board[row][col] = 1
-                else:         # O
-                    drawO(row, col)
-                    board[row][col] = 2
 
-                # increment turn, redraw board
+                # X
+                drawX(row, col)
+                board[row][col] = 1
                 turn += 1
+                
+                # O
+                botRow, botCol = botMove(board, 9-turn)
+                if(botRow != -1):
+                    drawO(botRow, botCol)
+                    board[botRow][botCol] = 2
+                    turn += 1
+                
+                # redraw board
                 displayBoard()
 
                 # check to see if the game has been won using checkWin function
-                gameWon = checkWin(board)
+                gameWon, player = checkWin(board)
                 if(gameWon):
-                    if(turn % 2):
+                    if(player == 0):
                         score_o += 1
                         # draw rectangle for end screen, tint colour of the winning player
                         drawEndRectangle((240,180,180))
@@ -147,8 +151,8 @@ while(True):
                         score_x += 1
                         drawEndRectangle((180,180,240))
                     # display game over message
-                    displayMessage("Game over. " + ("O" if turn % 2 else "X") + " won!", -20)
-                    print(("O" if turn % 2 else "X") + " won!")
+                    displayMessage("Game over. " + ("X" if player else "O") + " won!", -20)
+                    print(("X" if player else "O") + " won!")
                 
                 # board is full, game is drawn
                 elif(turn == 9):
@@ -166,4 +170,5 @@ while(True):
                     print(f"Scores\n * O: {score_o}\n * X: {score_x}")
                     print("Waiting for reset...")
                     gameEnd = True
+
         pygame.display.update()
