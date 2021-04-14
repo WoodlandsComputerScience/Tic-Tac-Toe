@@ -33,19 +33,19 @@ def botMove(board, depth):
 			if(board[i][j] == 0): 				# visit each available cell
 				temp = copy.deepcopy(board) 	# duplicate original board
 				temp[i][j] = 2					# simulate the bot moving to that cell
-				score = minimax(temp, depth-1, False)
+				score = minimax(temp, depth-1, False, float('-inf'), float('inf'))
 				if(score < bestScore):
 					bestScore = score
 					row, col = i, j
 
 	return row, col
 
-def minimax(board, depth, bot):
+def minimax(board, depth, bot, alpha, beta):
 
 	gameWon, player = checkWin(board)
 	if(gameWon): 
 		if(player == 1): return 1 * (depth+1)	# positive score if player wins, negative if bot wins
-		else: return -1 * (depth+1)				# multiply by depth to win in the fewest moves possible (+1 to avoid multiplying by 0)
+		else: return -1 * (depth+1)				# multiply by depth to prioritize winning in the fewest moves possible (+1 to avoid multiplying by 0)
 
 	elif(depth == 0):							# tie score set as 0
 		return 0
@@ -57,7 +57,10 @@ def minimax(board, depth, bot):
 				if(board[i][j] == 0):
 					temp = copy.deepcopy(board)
 					temp[i][j] = 2
-					bestScore = min(bestScore, minimax(temp, depth-1, False))
+					bestScore = min(bestScore, minimax(temp, depth-1, False, alpha, beta))
+					beta = min(beta, bestScore)
+					if(beta <= alpha):
+						break
 	else: # player's turn (maximizing)
 		bestScore = float('-inf')
 		for i in range(3):
@@ -65,7 +68,10 @@ def minimax(board, depth, bot):
 				if(board[i][j] == 0):
 					temp = copy.deepcopy(board)
 					temp[i][j] = 1
-					bestScore = max(bestScore, minimax(temp, depth-1, True))
+					bestScore = max(bestScore, minimax(temp, depth-1, True, alpha, beta))
+					alpha = max(alpha, bestScore)
+					if(beta <= alpha):
+						break
 
 	return bestScore
 
