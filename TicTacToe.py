@@ -3,6 +3,12 @@ from BotMoves import botMove
 
 pygame.init()
 
+# Size of board (min: 2)
+boardSize = 4
+
+# Max number of moves (for checking for draws)
+maxMoves = boardSize**2
+
 screenWidth = 600
 screenHeight = 600
 
@@ -16,9 +22,11 @@ screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Tic Tac Toe")
 screen.fill(WHITE)
 
-# keeps track of the tic-tac-toe board
-board = [[0]*3 for i in range(3)]
+def newBoard():
+    return [[0]*boardSize for i in range(boardSize)]
 
+# keeps track of the tic-tac-toe board
+board = newBoard()
 # keep track of how many turns have elapsed
 turn = 0
 
@@ -36,23 +44,23 @@ def renderScore():
     
 # draws a 3x3 grid onto the screen
 def setup(lineColor, lineWidth):
-    pygame.draw.line(screen, lineColor, (screenWidth/3, 0), (screenWidth/3, screenHeight), lineWidth)
-    pygame.draw.line(screen, lineColor, (screenWidth/3*2, 0), (screenWidth/3*2, screenHeight), lineWidth)
-    pygame.draw.line(screen, lineColor, (0, screenHeight/3), (screenWidth, screenHeight/3), lineWidth)
-    pygame.draw.line(screen, lineColor, (0, screenHeight/3*2), (screenWidth, screenHeight/3*2), lineWidth)
+    for v in range(boardSize-1):
+        pygame.draw.line(screen, lineColor, ((screenWidth//boardSize)*(v+1), 0), ((screenWidth//boardSize)*(v+1), screenHeight), lineWidth)
+    for h in range(boardSize-1):
+        pygame.draw.line(screen, lineColor, (0, (screenHeight//boardSize)*(h+1)), (screenWidth, (screenHeight//boardSize)*(h+1)), lineWidth)
     renderScore()
 
 def resetBoard():
     global board, turn
-    board = [[0]*3 for i in range(3)]
+    board = newBoard()
     turn = 0
     screen.fill(WHITE)
     setup(BLACK, 5);
 
 def displayBoard():
-    for x in range(3):
+    for x in range(boardSize):
         print("|", end="")
-        for y in range(3):
+        for y in range(boardSize):
             cur = board[x][y]
             print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = "|")
         print()
@@ -87,17 +95,45 @@ def displayMessage(message, y):
 def checkWin(board): 
     # a tuple - (if win exists, returns 1 if player1 wins 0 if player2/CPU wins)
     # check rows and cols
-    for i in range(3):
-        if(board[i][0] != 0 and board[i][0]==board[i][1] and board[i][1]==board[i][2]):
-            return (1, board[i][0] == 1)
-        if(board[0][i] != 0 and board[0][i]==board[1][i] and board[1][i]==board[2][i]):
-            return (1, board[0][i] == 1)
+    for i in range(boardSize):
+        m=0
+        n=0
+        if board[i][0]!=0:
+            winning=True
+            while winning and m<boardSize:
+                if board[i][0]!=board[i][m]:
+                    winning=False
+                m=m+1
+            if winning:
+                return (1,board[i][0]==1)
+        if board[0][i]!=0:
+            winning=True
+            while winning and n<boardSize:
+                if board[0][i]!=board[n][i]:
+                    winning=False
+                n=n+1
+            if winning:
+                return (1,board[0][i]==1)
 
     # check diagonals
-    if(board[0][0] != 0 and board[0][0]==board[1][1] and board[1][1]==board[2][2]):
-        return (1, board[1][1] == 1)
-    if(board[0][2] != 0 and board[0][2]==board[1][1] and board[1][1]==board[2][0]):
-        return (1, board[1][1] == 1)
+    if(board[0][0] != 0):
+        i=0
+        winning=True
+        while winning and i<boardSize:
+            if board[0][0]!=board[i][i]:
+                winning=False
+            i=i+1
+        if winning:
+            return (1, board[0][0] == 1)
+    if(board[boardSize-1][0] != 0):
+        i=0
+        winning=True
+        while winning and i<boardSize:
+            if board[0][boardSize-1]!=board[i][boardSize-1-i]:
+                winning=False
+            i=i+1
+        if winning:
+            return (1, board[0][boardSize-1] == 1)
 
     return (0, 0) 
 
@@ -118,8 +154,8 @@ while(True):
             y = ev.pos[1]
             
             # calculate where in the 3x3 grid the user clicked
-            row = y // (screenHeight // 3)
-            col = x // (screenWidth // 3)
+            row = y // (screenHeight // boardSize)
+            col = x // (screenWidth // boardSize)
             
             # check that the spot in the board is empty
             if(board[row][col] == 0):
@@ -131,7 +167,7 @@ while(True):
                 turn += 1
                 
                 # O
-                botRow, botCol = botMove(board, 9-turn)
+                botRow, botCol = botMove(board, maxMoves-turn)
                 if(botRow != -1):
                     drawO(botRow, botCol)
                     board[botRow][botCol] = 2
@@ -155,14 +191,14 @@ while(True):
                     print(("X" if player else "O") + " won!")
                 
                 # board is full, game is drawn
-                elif(turn == 9):
+                elif(turn == maxMoves):
                     drawEndRectangle(GREY)
                     font = pygame.font.SysFont("Source Code Pro", 40)
                     displayMessage("Game over. It's a draw!", -20)
                     print("DRAW!")
                 
                 # game ends
-                if(gameWon or turn == 9):
+                if(gameWon or turn == maxMoves):
                     # print end screen text
                     displayMessage("Click again to reset.", 20)
                     
