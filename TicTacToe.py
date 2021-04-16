@@ -4,7 +4,7 @@ from BotMoves import botMove
 pygame.init()
 
 # size of board (min: 2)
-boardSize = 3
+boardSize = 4
 
 # max number of moves (for checking for draws)
 maxMoves = boardSize**2
@@ -44,10 +44,10 @@ def renderScore():
     
 # draws a grid onto the screen based on board size
 def setup(lineColor, lineWidth):
-    for v in range(boardSize-1):
-        pygame.draw.line(screen, lineColor, ((SCREEN_WIDTH//boardSize)*(v+1), 0), ((SCREEN_WIDTH//boardSize)*(v+1), SCREEN_HEIGHT), lineWidth)
-    for h in range(boardSize-1):
-        pygame.draw.line(screen, lineColor, (0, (SCREEN_HEIGHT//boardSize)*(h+1)), (SCREEN_WIDTH, (SCREEN_HEIGHT//boardSize)*(h+1)), lineWidth)
+    for v in range(1, boardSize):
+        pygame.draw.line(screen, lineColor, ((SCREEN_WIDTH//boardSize)*v, 0), ((SCREEN_WIDTH//boardSize)*v, SCREEN_HEIGHT), lineWidth)
+    for h in range(1, boardSize):
+        pygame.draw.line(screen, lineColor, (0, (SCREEN_HEIGHT//boardSize)*h), (SCREEN_WIDTH, (SCREEN_HEIGHT//boardSize)*h), lineWidth)
     renderScore()
 
 def resetBoard():
@@ -59,23 +59,30 @@ def resetBoard():
 
 def displayBoard():
     for x in range(boardSize):
-        print("|", end="")
+        print('|', end = '')
         for y in range(boardSize):
             cur = board[x][y]
-            print("_" if cur == 0 else ("X" if cur == 1 else "O"), end = "|")
+            print('_' if cur == 0 else ('X' if cur == 1 else 'O'), end = '|')
         print()
 
 # draws X
 def drawX(row, col):
-    linePos1 = ((SCREEN_WIDTH/3*col+50,SCREEN_WIDTH/3*row+50), (SCREEN_WIDTH/3*col+150,SCREEN_WIDTH/3*row+150))
-    linePos2 = ((SCREEN_WIDTH/3*col+150,SCREEN_WIDTH/3*row+50), (SCREEN_WIDTH/3*col+50,SCREEN_WIDTH/3*row+150))
-    pygame.draw.line(screen, BLUE, linePos1[0], linePos1[1], 30)
-    pygame.draw.line(screen, BLUE, linePos2[0], linePos2[1], 30)
+    # x pos and y pos both divided by board size to fit
+    linePos1 = (((SCREEN_WIDTH*col + 150) / boardSize, (SCREEN_WIDTH*row + 150) / boardSize),
+                ((SCREEN_WIDTH*col + 450) / boardSize, (SCREEN_WIDTH*row + 450) / boardSize))
+    linePos2 = (((SCREEN_WIDTH*col + 450) / boardSize, (SCREEN_WIDTH*row + 150) / boardSize),
+                ((SCREEN_WIDTH*col + 150) / boardSize, (SCREEN_WIDTH*row + 450) / boardSize))
+    print(linePos1)
+    print(linePos2)
+    pygame.draw.line(screen, BLUE, linePos1[0], linePos1[1], 90 // boardSize)
+    pygame.draw.line(screen, BLUE, linePos2[0], linePos2[1], 90 // boardSize)
 
 # draws O
 def drawO(row, col):
-    pygame.draw.circle(screen, RED, (SCREEN_WIDTH/3*col + 100, SCREEN_WIDTH/3*row + 100), 70)
-    pygame.draw.circle(screen, WHITE, (SCREEN_WIDTH/3*col + 100, SCREEN_WIDTH/3*row + 100), 45)
+    pygame.draw.circle(screen, RED, ((SCREEN_WIDTH*col + 300) / boardSize,
+                                     (SCREEN_WIDTH*row + 300) / boardSize), 210 / boardSize)
+    pygame.draw.circle(screen, WHITE, ((SCREEN_WIDTH*col + 300) / boardSize,
+                                       (SCREEN_WIDTH*row + 300) / boardSize), 135 / boardSize)
 
 # draws rectangle at the center of the screen using given colour
 def drawEndRectangle(colour):
@@ -165,7 +172,7 @@ while(True):
                 drawX(row, col)
                 board[row][col] = 1
                 turn += 1
-                
+
                 # O
                 botRow, botCol = botMove(board, maxMoves-turn)
                 if(botRow != -1):
@@ -173,8 +180,9 @@ while(True):
                     board[botRow][botCol] = 2
                     turn += 1
                 
-                # redraw board
-                displayBoard()
+                # print board state to terminal
+                # commented out because this is slow for larger boards
+                # displayBoard()
 
                 # check to see if the game has been won using checkWin function
                 gameWon, player = checkWin(board)
