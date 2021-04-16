@@ -45,9 +45,9 @@ def renderScore():
 # draws a grid onto the screen based on board size
 def setup(lineColor, lineWidth):
     for v in range(1, boardSize):
-        pygame.draw.line(screen, lineColor, ((SCREEN_WIDTH//boardSize)*v, 0), ((SCREEN_WIDTH//boardSize)*v, SCREEN_HEIGHT), lineWidth)
+        pygame.draw.line(screen, lineColor, ((SCREEN_WIDTH//boardSize)*v, 0), ((SCREEN_WIDTH//boardSize)*v, SCREEN_HEIGHT), max(1, lineWidth//boardSize))
     for h in range(1, boardSize):
-        pygame.draw.line(screen, lineColor, (0, (SCREEN_HEIGHT//boardSize)*h), (SCREEN_WIDTH, (SCREEN_HEIGHT//boardSize)*h), lineWidth)
+        pygame.draw.line(screen, lineColor, (0, (SCREEN_HEIGHT//boardSize)*h), (SCREEN_WIDTH, (SCREEN_HEIGHT//boardSize)*h), max(1, lineWidth//boardSize))
     renderScore()
 
 def resetBoard():
@@ -55,7 +55,7 @@ def resetBoard():
     board = newBoard()
     turn = 0
     screen.fill(WHITE)
-    setup(BLACK, 5);
+    setup(BLACK, 25);
 
 def displayBoard():
     for x in range(boardSize):
@@ -144,17 +144,23 @@ def checkWin(board):
 
     return (0, 0) 
 
-setup(BLACK, 5);
+setup(BLACK, 25);
 pygame.display.update()
 
+
+# Main Game Loop
 while(True):
+
     for ev in pygame.event.get():
+
         if(ev.type == pygame.QUIT):
             sys.exit()
+
         # check if the game has ended and is waiting to restart
         if(gameEnd and ev.type == pygame.MOUSEBUTTONDOWN):
             gameEnd = False
             resetBoard()
+
         # game still active, user clicks on screen
         elif(ev.type == pygame.MOUSEBUTTONDOWN):
             x = ev.pos[0]
@@ -174,11 +180,11 @@ while(True):
                 turn += 1
 
                 # O
-                botRow, botCol = botMove(board, maxMoves-turn)
-                if(botRow != -1):
-                    drawO(botRow, botCol)
-                    board[botRow][botCol] = 2
-                    turn += 1
+                # botRow, botCol = botMove(board, maxMoves-turn)
+                # if(botRow != -1):
+                #     drawO(botRow, botCol)
+                #     board[botRow][botCol] = 2
+                #     turn += 1
                 
                 # print board state to terminal
                 # commented out because this is slow for larger boards
