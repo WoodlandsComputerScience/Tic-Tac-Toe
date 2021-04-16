@@ -3,14 +3,14 @@ from BotMoves import botMove
 
 pygame.init()
 
-# Size of board (min: 2)
-boardSize = 4
+# size of board (min: 2)
+boardSize = 3
 
-# Max number of moves (for checking for draws)
+# max number of moves (for checking for draws)
 maxMoves = boardSize**2
 
-screenWidth = 600
-screenHeight = 600
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -18,12 +18,12 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 GREY = (180, 180, 180)
-screen = pygame.display.set_mode((screenWidth, screenHeight))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Tic Tac Toe")
 screen.fill(WHITE)
 
 def newBoard():
-    return [[0]*boardSize for i in range(boardSize)]
+    return [[0] * boardSize for i in range(boardSize)]
 
 # keeps track of the tic-tac-toe board
 board = newBoard()
@@ -42,12 +42,12 @@ def renderScore():
     label_x = font.render(f"{score_x}", 1, BLUE)
     screen.blit(label_x, (10, 30))
     
-# draws a 3x3 grid onto the screen
+# draws a grid onto the screen based on board size
 def setup(lineColor, lineWidth):
     for v in range(boardSize-1):
-        pygame.draw.line(screen, lineColor, ((screenWidth//boardSize)*(v+1), 0), ((screenWidth//boardSize)*(v+1), screenHeight), lineWidth)
+        pygame.draw.line(screen, lineColor, ((SCREEN_WIDTH//boardSize)*(v+1), 0), ((SCREEN_WIDTH//boardSize)*(v+1), SCREEN_HEIGHT), lineWidth)
     for h in range(boardSize-1):
-        pygame.draw.line(screen, lineColor, (0, (screenHeight//boardSize)*(h+1)), (screenWidth, (screenHeight//boardSize)*(h+1)), lineWidth)
+        pygame.draw.line(screen, lineColor, (0, (SCREEN_HEIGHT//boardSize)*(h+1)), (SCREEN_WIDTH, (SCREEN_HEIGHT//boardSize)*(h+1)), lineWidth)
     renderScore()
 
 def resetBoard():
@@ -67,15 +67,15 @@ def displayBoard():
 
 # draws X
 def drawX(row, col):
-    linePos1 = ((screenWidth/3*col+50,screenWidth/3*row+50), (screenWidth/3*col+150,screenWidth/3*row+150))
-    linePos2 = ((screenWidth/3*col+150,screenWidth/3*row+50), (screenWidth/3*col+50,screenWidth/3*row+150))
+    linePos1 = ((SCREEN_WIDTH/3*col+50,SCREEN_WIDTH/3*row+50), (SCREEN_WIDTH/3*col+150,SCREEN_WIDTH/3*row+150))
+    linePos2 = ((SCREEN_WIDTH/3*col+150,SCREEN_WIDTH/3*row+50), (SCREEN_WIDTH/3*col+50,SCREEN_WIDTH/3*row+150))
     pygame.draw.line(screen, BLUE, linePos1[0], linePos1[1], 30)
     pygame.draw.line(screen, BLUE, linePos2[0], linePos2[1], 30)
 
 # draws O
 def drawO(row, col):
-    pygame.draw.circle(screen, RED, (screenWidth/3*col + 100, screenWidth/3*row + 100), 70)
-    pygame.draw.circle(screen, WHITE, (screenWidth/3*col + 100, screenWidth/3*row + 100), 45)
+    pygame.draw.circle(screen, RED, (SCREEN_WIDTH/3*col + 100, SCREEN_WIDTH/3*row + 100), 70)
+    pygame.draw.circle(screen, WHITE, (SCREEN_WIDTH/3*col + 100, SCREEN_WIDTH/3*row + 100), 45)
 
 # draws rectangle at the center of the screen using given colour
 def drawEndRectangle(colour):
@@ -89,50 +89,50 @@ def drawEndRectangle(colour):
 def displayMessage(message, y):
     font = pygame.font.SysFont("Source Code Pro", 40)
     displayText = font.render(message, 1, BLACK)
-    displayPosition = displayText.get_rect(center = (screenWidth/2, screenHeight/2 + y))
+    displayPosition = displayText.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + y))
     screen.blit(displayText, displayPosition)
 
 def checkWin(board): 
     # a tuple - (if win exists, returns 1 if player1 wins 0 if player2/CPU wins)
     # check rows and cols
     for i in range(boardSize):
-        m=0
-        n=0
-        if board[i][0]!=0:
-            winning=True
-            while winning and m<boardSize:
-                if board[i][0]!=board[i][m]:
-                    winning=False
-                m=m+1
-            if winning:
-                return (1,board[i][0]==1)
-        if board[0][i]!=0:
-            winning=True
-            while winning and n<boardSize:
-                if board[0][i]!=board[n][i]:
-                    winning=False
-                n=n+1
-            if winning:
+        m = 0
+        n = 0
+        if(board[i][0] != 0):
+            winning = True
+            while(winning and m < boardSize):
+                if(board[i][0] != board[i][m]):
+                    winning= False
+                m += 1
+            if(winning):
+                return (1, board[i][0] == 1)
+        if(board[0][i] != 0):
+            winning = True
+            while(winning and n < boardSize):
+                if(board[0][i] != board[n][i]):
+                    winning = False
+                n += 1
+            if(winning):
                 return (1,board[0][i]==1)
 
     # check diagonals
     if(board[0][0] != 0):
-        i=0
-        winning=True
-        while winning and i<boardSize:
-            if board[0][0]!=board[i][i]:
-                winning=False
-            i=i+1
-        if winning:
+        i = 0
+        winning = True
+        while(winning and i < boardSize):
+            if(board[0][0] != board[i][i]):
+                winning = False
+            i += 1
+        if(winning):
             return (1, board[0][0] == 1)
     if(board[boardSize-1][0] != 0):
-        i=0
-        winning=True
-        while winning and i<boardSize:
-            if board[0][boardSize-1]!=board[i][boardSize-1-i]:
-                winning=False
-            i=i+1
-        if winning:
+        i = 0
+        winning = True
+        while(winning and i < boardSize):
+            if(board[0][boardSize-1] != board[i][boardSize-1-i]):
+                winning = False
+            i += 1
+        if(winning):
             return (1, board[0][boardSize-1] == 1)
 
     return (0, 0) 
@@ -154,8 +154,8 @@ while(True):
             y = ev.pos[1]
             
             # calculate where in the 3x3 grid the user clicked
-            row = y // (screenHeight // boardSize)
-            col = x // (screenWidth // boardSize)
+            row = y // (SCREEN_HEIGHT // boardSize)
+            col = x // (SCREEN_WIDTH // boardSize)
             
             # check that the spot in the board is empty
             if(board[row][col] == 0):
