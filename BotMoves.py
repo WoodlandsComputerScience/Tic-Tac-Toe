@@ -1,4 +1,3 @@
-import copy
 
 def printBoard(board):
     print(*board,sep='\n')
@@ -132,7 +131,7 @@ def minimax(board, depth, boardSize, winCondition, bot, alpha, beta):
         for i in range(boardSize):
             for j in range(boardSize):
                 if(board[i][j] == 0):
-                    board[i][j] = 2
+                    board[i][j] = 1
                     bestScore = max(bestScore, minimax(board, depth-1, boardSize, winCondition, True, alpha, beta))
                     board[i][j] = 0
                     alpha = max(alpha, bestScore)
