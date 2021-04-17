@@ -222,7 +222,7 @@ while(True):
                     turn += 1
 
                     # O
-                    botRow, botCol = botMove(board, maxMoves-turn)
+                    botRow, botCol = botMove(board, maxMoves-turn, boardSize, winCondition)
                     if(botRow != -1):
                         drawO(botRow, botCol)
                         board[botRow][botCol] = 2
